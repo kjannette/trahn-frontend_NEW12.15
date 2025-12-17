@@ -1,34 +1,32 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { Link } from 'react-router-dom';
+import { addToWaitlist } from '../auth/firebase';
 
 export function Signup() {
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signup } = useAuth();
-    const navigate = useNavigate();
+    const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState('');
 
     async function handleSubmit(e) {
         e.preventDefault();
-
-        if (password !== confirmPassword) {
-            return setError('Passwords do not match');
-        }
-
-        if (password.length < 6) {
-            return setError('Password must be at least 6 characters');
+        
+        if (!email) {
+            return setError('Please enter your email address');
         }
 
         try {
             setError('');
             setLoading(true);
-            await signup(email, password);
-            navigate('/login', { state: { message: 'Account created! Please log in.' } });
+            const result = await addToWaitlist(email);
+            
+            if (result.success) {
+                setSubmitted(true);
+            } else {
+                setError(result.error || 'Failed to join waitlist. Please try again.');
+            }
         } catch (err) {
-            setError(err.message || 'Failed to create account');
+            setError('Something went wrong. Please try again.');
         }
         setLoading(false);
     }
@@ -44,57 +42,51 @@ export function Signup() {
       ██║   ██║  ██║██║  ██║██║  ██║██║ ╚████║
       ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝`}</pre>
                 
-                <h2>Create Account</h2>
-                
-                {error && <div className="auth-error">{error}</div>}
-                
-                <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            placeholder="you@example.com"
-                        />
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            placeholder="••••••••"
-                        />
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="confirmPassword">Confirm Password</label>
-                        <input
-                            type="password"
-                            id="confirmPassword"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                            placeholder="••••••••"
-                        />
-                    </div>
-                    
-                    <button type="submit" className="auth-btn" disabled={loading}>
-                        {loading ? 'Creating Account...' : 'Sign Up'}
-                    </button>
-                </form>
-                
-                <p className="auth-link">
-                    Already have an account? <Link to="/login">Log In</Link>
-                </p>
+                {submitted ? (
+                    <>
+                        <h2>Request Received</h2>
+                        <div className="waitlist-message">
+                            <p>
+                                A message has been sent requesting authorization for signup. 
+                                You will receive a response to your email when granted, or 
+                                further information regarding the waitlist.
+                            </p>
+                            <p className="thank-you">Thank you for your interest!</p>
+                        </div>
+                        <p className="auth-link">
+                            Already have an account? <Link to="/login">Log In</Link>
+                        </p>
+                    </>
+                ) : (
+                    <>
+                        <h2>Join Waitlist</h2>
+                        
+                        {error && <div className="auth-error">{error}</div>}
+                        
+                        <form onSubmit={handleSubmit} className="auth-form">
+                            <div className="form-group">
+                                <label htmlFor="email">Email</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    placeholder="you@example.com"
+                                />
+                            </div>
+                            
+                            <button type="submit" className="auth-btn" disabled={loading}>
+                                {loading ? 'Submitting...' : 'Request Access'}
+                            </button>
+                        </form>
+                        
+                        <p className="auth-link">
+                            Already have an account? <Link to="/login">Log In</Link>
+                        </p>
+                    </>
+                )}
             </div>
         </div>
     );
 }
-
