@@ -24,8 +24,13 @@ function App() {
     return (
         <div className="container">
             <header>
-                <h1>TRAHN<span className="accent">GRID</span></h1>
-                <div className="subtitle">ETH Grid Trader</div>
+                <pre className="ascii-logo">{`
+   ████████╗██████╗  █████╗ ██╗  ██╗███╗   ██╗
+   ╚══██╔══╝██╔══██╗██╔══██╗██║  ██║████╗  ██║
+      ██║   ██████╔╝███████║███████║██╔██╗ ██║
+      ██║   ██╔══██╗██╔══██║██╔══██║██║╚██╗██║
+      ██║   ██║  ██║██║  ██║██║  ██║██║ ╚████║
+      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝`}</pre>
             </header>
             
             <CarouselNav 
