@@ -1,79 +1,61 @@
-import { Chart } from './components/Chart';
-import { CarouselNav, DayIndicators, ConnectionStatus } from './components/CarouselNav';
-import { Stats } from './components/Stats';
-import { useChartData } from './hooks/useChartData';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { Dashboard } from './pages/Dashboard';
+import { Login } from './pages/Login';
+import { Signup } from './pages/Signup';
 import './App.css';
 
-function App() {
-    const {
-        prices,
-        trades,
-        availableDays,
-        currentDayIndex,
-        currentDay,
-        isLive,
-        loading,
-        connectionStatus,
-        navigatePrev,
-        navigateNext,
-        navigateTo,
-        canGoPrev,
-        canGoNext,
-    } = useChartData();
+// Redirect authenticated users away from auth pages
+function PublicRoute({ children }) {
+    const { currentUser } = useAuth();
+    
+    if (currentUser) {
+        return <Navigate to="/" replace />;
+    }
+    
+    return children;
+}
 
+function AppRoutes() {
     return (
-        <div className="container">
-            <header>
-                <pre className="ascii-logo">{`
-   ████████╗██████╗  █████╗ ██╗  ██╗███╗   ██╗
-   ╚══██╔══╝██╔══██╗██╔══██╗██║  ██║████╗  ██║
-      ██║   ██████╔╝███████║███████║██╔██╗ ██║
-      ██║   ██╔══██╗██╔══██║██╔══██║██║╚██╗██║
-      ██║   ██║  ██║██║  ██║██║  ██║██║ ╚████║
-      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝`}</pre>
-            </header>
-            
-            <CarouselNav 
-                currentDay={currentDay}
-                availableDays={availableDays}
-                currentDayIndex={currentDayIndex}
-                isLive={isLive}
-                canGoPrev={canGoPrev}
-                canGoNext={canGoNext}
-                onPrev={navigatePrev}
-                onNext={navigateNext}
-                onNavigateTo={navigateTo}
+        <Routes>
+            <Route 
+                path="/" 
+                element={
+                    <ProtectedRoute>
+                        <Dashboard />
+                    </ProtectedRoute>
+                } 
             />
-            
-            <div className="chart-wrapper">
-                <Chart prices={prices} trades={trades} />
-                {loading && (
-                    <div className="loading-overlay">
-                        <div className="spinner" />
-                        <span>Waiting for data...</span>
-                    </div>
-                )}
-            </div>
-            
-            <Stats prices={prices} trades={trades} />
-            
-            <DayIndicators 
-                availableDays={availableDays}
-                currentDayIndex={currentDayIndex}
-                onNavigateTo={navigateTo}
+            <Route 
+                path="/login" 
+                element={
+                    <PublicRoute>
+                        <Login />
+                    </PublicRoute>
+                } 
             />
-            
-            <div className="legend">
-                <span className="legend-item">
-                    <span className="dot buy-dot" /> Buy (USDC → ETH)
-                </span>
-                <span className="legend-item">
-                    <span className="dot sell-dot" /> Sell (ETH → USDC)
-                </span>
-            </div>
-            
-            <ConnectionStatus status={connectionStatus} />
-        </div>
+            <Route 
+                path="/signup" 
+                element={
+                    <PublicRoute>
+                        <Signup />
+                    </PublicRoute>
+                } 
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+    );
+}
+
+function App() {
+    return (
+        <Router>
+            <AuthProvider>
+                <AppRoutes />
+            </AuthProvider>
+        </Router>
     );
 }
 
