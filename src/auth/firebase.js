@@ -10,7 +10,7 @@ export const db = getFirestore(app);
 // Add email to waitlist collection
 export async function addToWaitlist(email) {
     try {
-        await addDoc(collection(db, 'waitlist'), {
+        await addDoc(collection(db, 'trahn-trade-signups'), {
             email: email,
             createdAt: serverTimestamp(),
             status: 'pending'
