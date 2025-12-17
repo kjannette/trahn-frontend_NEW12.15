@@ -1,6 +1,9 @@
 import { useState } from 'react';
+
+
 import { Link } from 'react-router-dom';
 import { addToWaitlist } from '../auth/firebase';
+
 
 export function Signup() {
     const [email, setEmail] = useState('');
@@ -44,6 +47,7 @@ export function Signup() {
                 
                 {submitted ? (
                     <>
+
                         <h2>Request Received</h2>
                         <div className="waitlist-message">
                             <p>
@@ -76,11 +80,13 @@ export function Signup() {
                                 />
                             </div>
                             
+
                             <button type="submit" className="auth-btn" disabled={loading}>
                                 {loading ? 'Submitting...' : 'Request Access'}
                             </button>
                         </form>
-                        
+
+
                         <p className="auth-link">
                             Already have an account? <Link to="/login">Log In</Link>
                         </p>
