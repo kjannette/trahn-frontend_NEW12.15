@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+secrets.js
+./secrets.js
+./secrets.js*
+*secrets.js
+/src/auth/secrets.js
+/src/auth/secrets.js*
+/auth/secrets.js
+/auth/secrets.js*
