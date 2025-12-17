@@ -11,6 +11,7 @@ export function useChartData() {
     const [currentDayIndex, setCurrentDayIndex] = useState(0);
     const [prices, setPrices] = useState([]);
     const [trades, setTrades] = useState([]);
+    const [grid, setGrid] = useState([]);
     const [isLive, setIsLive] = useState(false);
     const [connectionStatus, setConnectionStatus] = useState('connecting');
     const [loading, setLoading] = useState(true);
@@ -57,6 +58,7 @@ export function useChartData() {
                 setIsLive(true);
                 setPrices(data.prices || []);
                 setTrades(data.trades || []);
+                setGrid(data.grid || []);
             }
             
             setConnectionStatus('connected');
@@ -161,6 +163,7 @@ export function useChartData() {
     return {
         prices,
         trades,
+        grid,
         availableDays,
         currentDayIndex,
         currentDay,
