@@ -1,27 +1,53 @@
 import { Chart } from '../components/Chart';
 import { CarouselNav, DayIndicators, ConnectionStatus } from '../components/CarouselNav';
 import { Stats } from '../components/Stats';
-import { useChartData } from '../hooks/useChartData';
+import { useTradingData } from '../contexts/TradingDataContext';
+import { useCarousel } from '../hooks/useTradingData';
+import { useHistoricalDay } from '../hooks/useTradingData';
 import { useAuth } from '../contexts/AuthContext';
+import { useEffect } from 'react';
 
 export function Dashboard() {
     const { logout } = useAuth();
+    const { state, dispatch } = useTradingData();
+    const carousel = useCarousel();
+    
+    // Load historical day data when viewing past days
+    const historicalDate = !state.isLive ? state.availableDays[state.currentDayIndex] : null;
+    const { data: historicalData } = useHistoricalDay(historicalDate, !state.isLive);
+    
+    // Update context with historical data when loaded
+    useEffect(() => {
+        if (historicalData && !state.isLive) {
+            dispatch({
+                type: 'LOAD_HISTORICAL_DAY',
+                prices: historicalData.prices,
+                trades: historicalData.trades,
+                index: state.currentDayIndex,
+            });
+        }
+    }, [historicalData, state.isLive, state.currentDayIndex, dispatch]);
+    
     const {
         prices,
         trades,
         grid,
         availableDays,
         currentDayIndex,
-        currentDay,
         isLive,
-        loading,
         connectionStatus,
+    } = state;
+    
+    const {
         navigatePrev,
         navigateNext,
         navigateTo,
         canGoPrev,
         canGoNext,
-    } = useChartData();
+    } = carousel;
+    
+    const currentDay = availableDays[currentDayIndex];
+    const loading = connectionStatus === 'connecting';
 
     return (
         <div className="container">
