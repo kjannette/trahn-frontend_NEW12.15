@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 const CONFIG = {
     dataUrl: '/data/current.json',
@@ -6,28 +7,22 @@ const CONFIG = {
     retryIntervalMs: 10000,
 };
 
-export function useChartData() {
-    const [availableDays, setAvailableDays] = useState([]);
-    const [currentDayIndex, setCurrentDayIndex] = useState(0);
-    const [prices, setPrices] = useState([]);
-    const [trades, setTrades] = useState([]);
-    const [grid, setGrid] = useState([]);
-    const [isLive, setIsLive] = useState(false);
-    const [connectionStatus, setConnectionStatus] = useState('connecting');
-    const [loading, setLoading] = useState(true);
-    
-    const dayCache = useRef({});
-    const pollInterval = useRef(null);
+//below is just the beggining of the refactored code
+export const useFetchChartData = () => {
+    return useQuery({
+        queryKey: ['chartData'],
+        queryFn: () => fetchChartData(),
+    });         
+}
+
+const fetchChartData = async () => {
+    const response = await fetch(CONFIG.dataUrl + '?t=' + Date.now());
+    return response.json();
+}
 
     const fetchData = useCallback(async () => {
         try {
-            const response = await fetch(CONFIG.dataUrl + '?t=' + Date.now());
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            
-            const data = await response.json();
+            const data = await fetchChartData();
             
             // Update available days
             let days = [];
