@@ -19,14 +19,15 @@ const initialState = {
 function reducer(state, action) {
     switch (action.type) {
         case 'UPDATE_CURRENT_DAY':
+            const dayIndex = action.availableDays.length > 0 ? action.availableDays.length - 1 : 0;
             return {
                 ...state,
-                prices: action.prices,
-                trades: action.trades,
-                grid: action.grid,
-                availableDays: action.availableDays,
+                prices: action.prices || [],
+                trades: action.trades || [],
+                grid: action.grid || [],
+                availableDays: action.availableDays || [],
                 currentDay: action.currentDay,
-                currentDayIndex: action.availableDays.length - 1,
+                currentDayIndex: dayIndex,
                 isLive: true,
                 connectionStatus: 'connected',
             };
@@ -88,13 +89,13 @@ export function TradingDataProvider({ children }) {
     
     // Update context when live data changes
     useEffect(() => {
-        if (currentData && state.isLive) {
+        if (currentData) {
             dispatch({ 
                 type: 'UPDATE_CURRENT_DAY', 
                 ...currentData 
             });
         }
-    }, [currentData, state.isLive]);
+    }, [currentData]);
     
     // Handle connection status
     useEffect(() => {
