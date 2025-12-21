@@ -46,7 +46,7 @@ export function Dashboard() {
         canGoNext,
     } = carousel;
     
-    const currentDay = availableDays[currentDayIndex];
+    const currentDay = availableDays[currentDayIndex] || null;
     const loading = connectionStatus === 'connecting';
 
     return (
